@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import User from '../models/user';
+import { sendEmail } from '../utils/email';
 
 const createToken = (user: any) => {
     return jwt.sign(
@@ -30,11 +31,17 @@ export const signup = async (req: Request, res: Response) => {
             isVerified: false
         });
 
-        res.status(201).json({ 
-            message: "Verify your phone", 
-            email: user.email,
-            otp // Sending in response for testing; in prod, send via SMS/Email
-        });
+        const sent = await sendEmail(
+            user.email,
+            'Your verification code',
+            `Your verification code is ${otp}`
+        );
+
+        const response: any = { message: "Verify your phone", email: user.email, otpSent: sent };
+        if (!sent) {
+            response.otp = otp;
+        }
+        res.status(201).json(response);
     } catch (error) {
         res.status(500).json({ message: 'Server error' });
     }
@@ -47,6 +54,9 @@ export const login = async (req: Request, res: Response) => {
         const user = await User.findOne({ email });
         if (!user || !(await bcrypt.compare(password, user.password))) {
             return res.status(400).json({ message: 'Invalid credentials' });
+        }
+        if (!user.isVerified) {
+            return res.status(403).json({ message: 'Please verify OTP', requiresOtp: true });
         }
 
         const token = createToken(user);
@@ -71,6 +81,32 @@ export const verifyOtp = async (req: Request, res: Response) => {
     res.status(400).json({ message: "Invalid code" });
 };
 
+export const resendOtp = async (req: Request, res: Response) => {
+    try {
+        const { email } = req.body;
+        const user = await User.findOne({ email });
+        if (!user) return res.status(404).json({ message: "User not found" });
+
+        const otp = Math.floor(1000 + Math.random() * 9000).toString();
+        user.otp = otp;
+        await user.save();
+
+        const sent = await sendEmail(
+            user.email,
+            'Your verification code',
+            `Your verification code is ${otp}`
+        );
+
+        const response: any = { message: "OTP resent", otpSent: sent };
+        if (!sent) {
+            response.otp = otp;
+        }
+        res.json(response);
+    } catch (error) {
+        res.status(500).json({ message: 'Server error' });
+    }
+};
+
 // Screen 9: FORGOT PASSWORD
 export const requestPasswordReset = async (req: Request, res: Response) => {
     const { email } = req.body;
@@ -81,7 +117,17 @@ export const requestPasswordReset = async (req: Request, res: Response) => {
     user.resetTokenExpires = new Date(Date.now() + 600000); 
     await user.save();
 
-    res.json({ message: "Code has been sent!" }); // Screen 10
+    const sent = await sendEmail(
+        user.email,
+        'Your password reset code',
+        `Your password reset code is ${user.resetToken}`
+    );
+
+    const response: any = { message: "Code has been sent!", resetSent: sent };
+    if (!sent) {
+        response.code = user.resetToken;
+    }
+    res.json(response); // Screen 10
 };
 
 // Final Step: RESET PASSWORD 
