@@ -6,6 +6,7 @@ export interface IService extends Document {
   duration: number; // in minutes
   price: number;
   category: string;
+  salon: mongoose.Types.ObjectId;
   isActive: boolean;
 }
 
@@ -30,6 +31,12 @@ const ServiceSchema: Schema = new Schema(
     category: {
       type: String,
       required: true,
+    },
+    salon: {
+      type: Schema.Types.ObjectId,
+      ref: 'Salon',
+      required: true,
+      index: true,
     },
     isActive: {
       type: Boolean,

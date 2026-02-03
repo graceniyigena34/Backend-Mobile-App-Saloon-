@@ -3,6 +3,7 @@ import mongoose, { Schema, Document } from 'mongoose';
 export interface IBooking extends Document {
   customer: mongoose.Types.ObjectId;
   service: mongoose.Types.ObjectId;
+  salon: mongoose.Types.ObjectId;
   date: Date;
   time: string;
   status: 'pending' | 'confirmed' | 'completed' | 'cancelled';
@@ -19,6 +20,11 @@ const BookingSchema: Schema = new Schema(
     service: {
       type: Schema.Types.ObjectId,
       ref: 'Service',
+      required: true,
+    },
+    salon: {
+      type: Schema.Types.ObjectId,
+      ref: 'Salon',
       required: true,
     },
     date: {
