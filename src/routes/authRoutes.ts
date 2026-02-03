@@ -12,6 +12,13 @@ const router = Router();
  *     summary: Login
  *     tags:
  *       - Auth
+ *     responses:
+ *       200:
+ *         description: Login successful
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/AuthLoginResponse'
  * /api/auth/signup:
  *   post:
  *     summary: Sign up (register)

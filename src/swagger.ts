@@ -74,6 +74,20 @@ const options: swaggerJSDoc.Options = {
             metadata: { type: 'object' },
           },
         },
+        AuthLoginResponse: {
+          type: 'object',
+          properties: {
+            token: { type: 'string' },
+            user: {
+              type: 'object',
+              properties: {
+                id: { type: 'string' },
+                name: { type: 'string' },
+                role: { type: 'string' },
+              },
+            },
+          },
+        },
       },
     },
   },
