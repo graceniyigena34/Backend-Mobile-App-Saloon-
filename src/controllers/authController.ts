@@ -47,7 +47,7 @@ export const signup = async (req: Request, res: Response) => {
     }
 };
 
-// Screen 1: LOGIN
+// Screen: LOGIN
 export const login = async (req: Request, res: Response) => {
     try {
         const { email, password } = req.body;
@@ -66,7 +66,7 @@ export const login = async (req: Request, res: Response) => {
     }
 };
 
-// Screen 6: VERIFY OTP
+// Screen: VERIFY OTP
 export const verifyOtp = async (req: Request, res: Response) => {
     const { email, otpEntered } = req.body;
     const user = await User.findOne({ email });
@@ -107,7 +107,7 @@ export const resendOtp = async (req: Request, res: Response) => {
     }
 };
 
-// Screen 9: FORGOT PASSWORD
+// Screen: FORGOT PASSWORD
 export const requestPasswordReset = async (req: Request, res: Response) => {
     const { email } = req.body;
     const user = await User.findOne({ email });

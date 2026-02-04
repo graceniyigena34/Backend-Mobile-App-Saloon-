@@ -13,6 +13,31 @@ const router = express.Router();
  *       - Notifications
  *     security:
  *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: List of user notifications
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Notification'
+ *       401:
+ *         description: Unauthorized
+ * 
+ * /api/notifications/read-all:
+ *   put:
+ *     summary: Mark all notifications as read
+ *     tags:
+ *       - Notifications
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: All notifications marked as read
+ *       401:
+ *         description: Unauthorized
+ * 
  * /api/notifications/{id}/read:
  *   put:
  *     summary: Mark a notification as read
@@ -24,16 +49,19 @@ const router = express.Router();
  *       - in: path
  *         name: id
  *         required: true
- * /api/notifications/read-all:
- *   put:
- *     summary: Mark all notifications as read
- *     tags:
- *       - Notifications
- *     security:
- *       - bearerAuth: []
+ *         schema:
+ *           type: string
+ *         description: Notification ID
+ *     responses:
+ *       200:
+ *         description: Notification marked as read
+ *       401:
+ *         description: Unauthorized
+ *       404:
+ *         description: Notification not found
  */
 router.get('/', auth, getMyNotifications);
-router.put('/:id/read', auth, markAsRead);
 router.put('/read-all', auth, markAllAsRead);
+router.put('/:id/read', auth, markAsRead);
 
 export default router;

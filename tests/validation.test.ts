@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { createBookingSchema, updateBookingStatusSchema } from '../src/validation/booking';
 import { createSalonSchema } from '../src/validation/salon';
 import { createServiceSchema } from '../src/validation/service';
+import { signupSchema } from '../src/validation/auth';
 
 describe('Validation schemas', () => {
   it('accepts valid booking payload', () => {
@@ -49,5 +50,21 @@ describe('Validation schemas', () => {
       category: 'Hair',
     });
     expect(result.success).toBe(false);
+  });
+
+  it('validates signup schema', () => {
+    const valid = signupSchema.safeParse({
+      name: 'Grace',
+      email: 'grace@example.com',
+      password: 'password123'
+    });
+    expect(valid.success).toBe(true);
+
+    const invalid = signupSchema.safeParse({
+      name: 'G',
+      email: 'invalid-email',
+      password: '123'
+    });
+    expect(invalid.success).toBe(false);
   });
 });
